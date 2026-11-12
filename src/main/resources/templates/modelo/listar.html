@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Modelos</title>
+</head>
+<body>
+<h1>Gestión de Modelos</h1>
+
+<a th:href="@{/modelos/crear}">Registrar Nuevo Modelo</a>
+<br><br>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nombre del Modelo</th>
+        <th>Marca</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="modelo : ${modelos}">
+        <td th:text="${modelo.idModelo}"></td>
+        <td th:text="${modelo.nombreModelo}"></td>
+        <td th:text="${modelo.marcaModelo}"></td>
+        <td th:text="${modelo.activoModelo ? 'Activo' : 'Dado de baja'}"></td>
+        <td>
+            <a th:href="@{/modelos/editar/{id}(id=${modelo.idModelo})}">Editar</a> |
+
+            <a th:if="${modelo.activoModelo}"
+               th:href="@{/modelos/eliminar/{id}(id=${modelo.idModelo})}"
+               onclick="return confirm('¿Está seguro de que desea dar de baja este modelo?');">
+                Dar de baja
+            </a>
+        </td>
+    </tr>
+    <tr th:if="${#lists.isEmpty(modelos)}">
+        <td colspan="5">No hay modelos registrados en el sistema.</td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
