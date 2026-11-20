@@ -35,6 +35,12 @@ public class UsuarioEntity implements Serializable {
     @Column(name = "password_usuario", nullable = false,length = 60)
     private String passwordUsuario;
 
+    @NotBlank
+    @jakarta.validation.constraints.Email(message = "El formato del correo no es válido")
+    @Size(max = 100)
+    @Column(name = "correo_usuario", nullable = false, unique = true, length = 100)
+    private String correoUsuario;
+
     @NotNull
     @Column(name = "es_activo", nullable = false)
     private Boolean esActivo;

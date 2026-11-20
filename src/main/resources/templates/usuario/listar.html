@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Usuarios')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('usuarios')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Gestión de Usuarios y Roles')}"></header>
+
+        <main class="p-4">
+            <div class="card-surface p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                    <div class="input-group" style="max-width: 340px;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="tableSearchInput" type="text" class="form-control" placeholder="Filtrar por nombre, usuario o rol...">
+                    </div>
+                    <a th:href="@{/usuarios/crear}" class="btn btn-primary">
+                        <i class="bi bi-person-plus-fill me-1"></i>Nuevo Usuario
+                    </a>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="dataTable" class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Usuario</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${usuarios}" data-searchable="true">
+                            <td th:text="${u.idUsuario}"></td>
+                            <td class="fw-semibold" th:text="${u.nombreUsuario}"></td>
+                            <td><code th:text="${u.userNameUsuario}"></code></td>
+                            <td class="small" th:text="${u.correoUsuario}"></td>
+                            <td><span class="badge bg-info text-dark" th:text="${u.rol}"></span></td>
+                            <td>
+                                <span th:if="${u.esActivo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${u.esActivo}" class="badge bg-danger">Inactivo</span>
+                            </td>
+                            <td class="text-end">
+                                <a th:href="@{/usuarios/editar/{id}(id=${u.idUsuario})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:if="${u.esActivo and u.userNameUsuario != usernameActual}" href="#"
+                                   th:data-confirm-url="@{/usuarios/eliminar/{id}(id=${u.idUsuario})}"
+                                   data-confirm-text="¿Seguro que desea dar de baja a este usuario? No podrá volver a iniciar sesión."
+                                   class="btn btn-sm btn-outline-danger" title="Dar de baja">
+                                    <i class="bi bi-person-x"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

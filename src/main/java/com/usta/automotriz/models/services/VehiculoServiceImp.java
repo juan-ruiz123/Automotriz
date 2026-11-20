@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Service
 public class VehiculoServiceImp implements VehiculoService {
+
     @Autowired
     private VehiculoDao vehiculoDao;
 
@@ -21,20 +22,37 @@ public class VehiculoServiceImp implements VehiculoService {
     @Override
     public void guardarVehiculo(VehiculoEntity vehiculo) throws Exception {
         if (vehiculo.getPlacaVehiculo() != null) {
-            vehiculo.setPlacaVehiculo(vehiculo.getPlacaVehiculo().toUpperCase());
+            vehiculo.setPlacaVehiculo(vehiculo.getPlacaVehiculo().trim().toUpperCase());
         }
 
+        // RN-01: Formato ABC-123
         String regexPlaca = "^[A-Z]{3}-[0-9]{3}$";
-        if (!vehiculo.getPlacaVehiculo().matches(regexPlaca)) {
-            throw new Exception("Error: El formato de la placa es inválido. Debe ser ABC-123.");
+        if (vehiculo.getPlacaVehiculo() == null || !vehiculo.getPlacaVehiculo().matches(regexPlaca)) {
+            throw new Exception("El formato de la placa es inválido. Debe ser ABC-123 (ej. ABC-123).");
         }
 
-        if (vehiculo.getIdVehiculo() == null && vehiculoDao.existsByPlacaVehiculo(vehiculo.getPlacaVehiculo())) {
-            throw new Exception("Error: La placa " + vehiculo.getPlacaVehiculo() + " ya está registrada en el sistema.");
+        // RN-02 y Modelo obligatorio
+        if (vehiculo.getTipoPlaca() == null) {
+            throw new Exception("Debe seleccionar el tipo de placa (AMARILLA o BLANCA).");
+        }
+        if (vehiculo.getIdModelo() == null || vehiculo.getIdModelo().getIdModelo() == null) {
+            throw new Exception("Debe seleccionar un modelo para el vehículo.");
         }
 
         if (vehiculo.getIdVehiculo() == null) {
+            if (vehiculoDao.existsByPlacaVehiculo(vehiculo.getPlacaVehiculo())) {
+                throw new Exception("La placa " + vehiculo.getPlacaVehiculo() + " ya está registrada en el sistema.");
+            }
             vehiculo.setActivoVehiculo(true);
+        } else {
+            VehiculoEntity existente = vehiculoDao.findById(vehiculo.getIdVehiculo())
+                    .orElseThrow(() -> new Exception("El vehículo no existe."));
+
+            if (!existente.getPlacaVehiculo().equals(vehiculo.getPlacaVehiculo())
+                    && vehiculoDao.existsByPlacaVehiculo(vehiculo.getPlacaVehiculo())) {
+                throw new Exception("La placa " + vehiculo.getPlacaVehiculo() + " ya pertenece a otro vehículo.");
+            }
+            vehiculo.setActivoVehiculo(existente.getActivoVehiculo());
         }
 
         vehiculoDao.save(vehiculo);
@@ -47,18 +65,14 @@ public class VehiculoServiceImp implements VehiculoService {
 
     @Override
     public Optional<VehiculoEntity> buscarPorPlaca(String placa) {
-        return vehiculoDao.findByPlacaVehiculo(placa.toUpperCase());
+        return vehiculoDao.findByPlacaVehiculo(placa.trim().toUpperCase());
     }
 
     @Override
     public void darDeBaja(Long id) throws Exception {
-        Optional<VehiculoEntity> vehiculoExistente = vehiculoDao.findById(id);
-        if (vehiculoExistente.isPresent()) {
-            VehiculoEntity vehiculoUpdate = vehiculoExistente.get();
-            vehiculoUpdate.setActivoVehiculo(false);
-            vehiculoDao.save(vehiculoUpdate);
-        } else {
-            throw new Exception("Error: El vehículo no existe.");
-        }
+        VehiculoEntity vehiculo = vehiculoDao.findById(id)
+                .orElseThrow(() -> new Exception("El vehículo no existe."));
+        vehiculo.setActivoVehiculo(false);
+        vehiculoDao.save(vehiculo);
     }
 }

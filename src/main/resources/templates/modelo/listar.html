@@ -1,45 +1,70 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Listado de Modelos</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Modelos')}"></head>
 <body>
-<h1>Gestión de Modelos</h1>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('modelos')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Catálogo de Modelos')}"></header>
 
-<a th:href="@{/modelos/crear}">Registrar Nuevo Modelo</a>
-<br><br>
+        <main class="p-4">
+            <div class="card-surface p-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                    <div class="input-group" style="max-width: 320px;">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input id="tableSearchInput" type="text" class="form-control" placeholder="Filtrar por marca o modelo...">
+                    </div>
+                    <a th:if="${esAdmin}" th:href="@{/modelos/crear}" class="btn btn-primary">
+                        <i class="bi bi-plus-lg me-1"></i>Nuevo Modelo
+                    </a>
+                </div>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Nombre del Modelo</th>
-        <th>Marca</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="modelo : ${modelos}">
-        <td th:text="${modelo.idModelo}"></td>
-        <td th:text="${modelo.nombreModelo}"></td>
-        <td th:text="${modelo.marcaModelo}"></td>
-        <td th:text="${modelo.activoModelo ? 'Activo' : 'Dado de baja'}"></td>
-        <td>
-            <a th:href="@{/modelos/editar/{id}(id=${modelo.idModelo})}">Editar</a> |
-
-            <a th:if="${modelo.activoModelo}"
-               th:href="@{/modelos/eliminar/{id}(id=${modelo.idModelo})}"
-               onclick="return confirm('¿Está seguro de que desea dar de baja este modelo?');">
-                Dar de baja
-            </a>
-        </td>
-    </tr>
-    <tr th:if="${#lists.isEmpty(modelos)}">
-        <td colspan="5">No hay modelos registrados en el sistema.</td>
-    </tr>
-    </tbody>
-</table>
+                <div class="table-responsive">
+                    <table id="dataTable" class="table table-hover align-middle">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="m : ${modelos}" data-searchable="true">
+                            <td th:text="${m.idModelo}"></td>
+                            <td class="fw-semibold" th:text="${m.marcaModelo}"></td>
+                            <td th:text="${m.nombreModelo}"></td>
+                            <td>
+                                <span th:if="${m.activoModelo}" class="badge bg-success">Activo</span>
+                                <span th:unless="${m.activoModelo}" class="badge bg-danger">Dado de baja</span>
+                            </td>
+                            <td class="text-end">
+                                <a th:href="@{/modelos/detalle/{id}(id=${m.idModelo})}" class="btn btn-sm btn-outline-secondary" title="Detalle">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a th:if="${esAdmin}" th:href="@{/modelos/editar/{id}(id=${m.idModelo})}" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a th:if="${esAdmin and m.activoModelo}" href="#"
+                                   th:data-confirm-url="@{/modelos/eliminar/{id}(id=${m.idModelo})}"
+                                   data-confirm-text="¿Desea dar de baja este modelo? No aparecerá para nuevos registros."
+                                   class="btn btn-sm btn-outline-danger" title="Dar de baja">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(modelos)}">
+                            <td colspan="5" class="text-center text-muted py-4">No hay modelos registrados.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

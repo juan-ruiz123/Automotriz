@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario Reparación')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('reparaciones')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Orden de Reparación')}"></header>
+
+        <main class="p-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="card-surface p-4">
+                        <form th:action="@{/reparaciones/guardar}" th:object="${reparacion}" method="post">
+                            <input type="hidden" th:field="*{idReparacion}">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Vehículo a Intervenir *</label>
+                                <select class="form-select" th:field="*{idVehiculo}" required>
+                                    <option value="">Seleccione un vehículo activo...</option>
+                                    <option th:each="v : ${vehiculos}"
+                                            th:if="${v.activoVehiculo}"
+                                            th:value="${v.idVehiculo}"
+                                            th:text="${v.placaVehiculo + ' — ' + v.idModelo.marcaModelo + ' ' + v.idModelo.nombreModelo + ' (' + v.nombreDuenoVehi + ')'}">
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Tipo de Reparación *</label>
+                                    <select class="form-select" th:field="*{tipoReparacion}" required>
+                                        <option value="">Seleccione tipo...</option>
+                                        <option th:each="tr : ${tiposReparacion}"
+                                                th:value="${tr}"
+                                                th:text="${#strings.replace(tr.name(), '_', ' ')}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Mecánico Responsable *</label>
+                                    <select class="form-select" th:field="*{idUsuario}" required>
+                                        <option value="">Seleccione mecánico...</option>
+                                        <option th:each="mec : ${mecanicos}"
+                                                th:value="${mec.idUsuario}"
+                                                th:text="${mec.nombreUsuario + ' (@' + mec.userNameUsuario + ')'}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold">Observaciones Técnicas (Opcional)</label>
+                                <textarea class="form-control" th:field="*{observacion}" rows="3"
+                                          placeholder="Diagnóstico inicial, trabajos realizados o recomendaciones para el cliente..."></textarea>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/reparaciones/listar}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Guardar Orden
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

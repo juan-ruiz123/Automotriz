@@ -6,6 +6,7 @@ import java.util.Optional;
 
 public interface ReparacionService {
     List<ReparacionEntity> listarTodas();
+    List<ReparacionEntity> listarPorMecanicoUsername(String username);
     void guardarReparacion(ReparacionEntity reparacion) throws Exception;
     Optional<ReparacionEntity> buscarPorId(Long id);
     void cancelarReparacion(Long id) throws Exception;

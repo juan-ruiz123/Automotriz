@@ -52,6 +52,12 @@ private static final long serialVersionUID = 1L;
     @Column(name = "telefono_dueno",nullable = false,length = 13)
     private  String telefonoDueno;
 
+    @NotBlank
+    @jakarta.validation.constraints.Email(message = "El correo del dueño no es válido")
+    @Size(max = 100)
+    @Column(name = "correo_dueno", nullable = false, length = 100)
+    private String correoDueno;
+
     @NotNull
     @Column(name = "activo_vehiculo",nullable = false)
     private Boolean activoVehiculo;

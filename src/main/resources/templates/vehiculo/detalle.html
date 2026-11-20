@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle del Vehículo')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('vehiculos')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Ficha del Vehículo')}"></header>
+
+        <main class="p-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="card-surface p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <span class="badge bg-dark fs-5 me-2" th:text="${vehiculo.placaVehiculo}"></span>
+                                <span class="badge bg-warning text-dark" th:text="${'Placa ' + vehiculo.tipoPlaca}"></span>
+                            </div>
+                            <span th:if="${vehiculo.activoVehiculo}" class="badge bg-success">Activo</span>
+                            <span th:unless="${vehiculo.activoVehiculo}" class="badge bg-danger">Inactivo</span>
+                        </div>
+                        <hr>
+                        <div class="row g-3 mb-4">
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Marca y Modelo</span>
+                                <strong th:text="${vehiculo.idModelo.marcaModelo + ' ' + vehiculo.idModelo.nombreModelo}"></strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Propietario</span>
+                                <strong th:text="${vehiculo.nombreDuenoVehi}"></strong>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Identificación</span>
+                                <span th:text="${vehiculo.tipoDocumento + ' ' + vehiculo.documentoDuenoVehi}"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-muted small d-block">Teléfono</span>
+                                <span th:text="${vehiculo.telefonoDueno}"></span>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-muted small d-block">Correo de Notificaciones</span>
+                                <span th:text="${vehiculo.correoDueno}"></span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/vehiculos/listar}" class="btn btn-secondary">Volver</a>
+                            <a th:if="${esAdmin}" th:href="@{/vehiculos/editar/{id}(id=${vehiculo.idVehiculo})}" class="btn btn-primary">Editar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

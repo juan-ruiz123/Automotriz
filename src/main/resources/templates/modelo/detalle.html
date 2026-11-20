@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Detalle del Modelo')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('modelos')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Detalle del Modelo')}"></header>
+
+        <main class="p-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-7">
+                    <div class="card-surface p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4 class="fw-bold mb-0" th:text="${modelo.marcaModelo + ' ' + modelo.nombreModelo}"></h4>
+                            <span th:if="${modelo.activoModelo}" class="badge bg-success">Activo</span>
+                            <span th:unless="${modelo.activoModelo}" class="badge bg-danger">Inactivo</span>
+                        </div>
+                        <hr>
+                        <h6 class="fw-bold mb-3">Repuestos Compatibles Asociados</h6>
+                        <ul class="list-group mb-4" th:if="${!#lists.isEmpty(modelo.repuestos)}">
+                            <li class="list-group-item d-flex justify-content-between align-items-center" th:each="r : ${modelo.repuestos}">
+                                <span th:text="${r.nombreRepuesto + ' (' + r.eanRepuesto + ')'}"></span>
+                                <span class="badge bg-primary rounded-pill" th:text="${'Stock: ' + r.stockRepuesto}"></span>
+                            </li>
+                        </ul>
+                        <p th:if="${#lists.isEmpty(modelo.repuestos)}" class="text-muted small">Este modelo aún no tiene repuestos asociados.</p>
+
+                        <div class="d-flex justify-content-end gap-2">
+                            <a th:href="@{/modelos/listar}" class="btn btn-secondary">Volver</a>
+                            <a th:if="${esAdmin}" th:href="@{/modelos/editar/{id}(id=${modelo.idModelo})}" class="btn btn-primary">Editar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

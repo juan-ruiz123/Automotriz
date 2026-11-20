@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario Vehículo')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('vehiculos')}"></aside>
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Gestión de Vehículos')}"></header>
+
+        <main class="p-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card-surface p-4">
+                        <h5 class="fw-bold mb-4" th:text="${vehiculo.idVehiculo != null ? 'Editar Vehículo' : 'Registrar Nuevo Vehículo'}"></h5>
+
+                        <form th:action="@{/vehiculos/guardar}" th:object="${vehiculo}" method="post">
+                            <input type="hidden" th:field="*{idVehiculo}">
+
+                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-car-front me-2"></i>Datos del Vehículo</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Placa (ABC-123) *</label>
+                                    <input type="text" class="form-control text-uppercase" th:field="*{placaVehiculo}" required maxlength="7" placeholder="ABC-123">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Color de Placa *</label>
+                                    <select class="form-select" th:field="*{tipoPlaca}" required>
+                                        <option value="">Seleccione...</option>
+                                        <option th:each="tp : ${tiposPlaca}" th:value="${tp}" th:text="${tp}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Modelo *</label>
+                                    <select class="form-select" th:field="*{idModelo}" required>
+                                        <option value="">Seleccione modelo...</option>
+                                        <option th:each="m : ${modelos}"
+                                                th:if="${m.activoModelo or (vehiculo.idModelo != null and vehiculo.idModelo.idModelo == m.idModelo)}"
+                                                th:value="${m.idModelo}"
+                                                th:text="${m.marcaModelo + ' - ' + m.nombreModelo}">
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold text-primary mb-3"><i class="bi bi-person-vcard me-2"></i>Datos del Propietario</h6>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nombre del Dueño *</label>
+                                    <input type="text" class="form-control" th:field="*{nombreDuenoVehi}" required maxlength="50">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Tipo Doc. *</label>
+                                    <select class="form-select" th:field="*{tipoDocumento}" required>
+                                        <option value="">Seleccione...</option>
+                                        <option th:each="td : ${tiposDocumento}" th:value="${td}" th:text="${td}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Documento *</label>
+                                    <input type="text" class="form-control" th:field="*{documentoDuenoVehi}" required maxlength="10">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Teléfono *</label>
+                                    <input type="text" class="form-control" th:field="*{telefonoDueno}" required maxlength="13" placeholder="Ej: 3001234567">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Correo Electrónico (Notificaciones) *</label>
+                                    <input type="email" class="form-control" th:field="*{correoDueno}" required maxlength="100" placeholder="cliente@correo.com">
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2">
+                                <a th:href="@{/vehiculos/listar}" class="btn btn-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg me-1"></i>Guardar Vehículo
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,10 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Holaa</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Panel General')}"></head>
 <body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('inicio')}"></aside>
 
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Panel General del Taller')}"></header>
+
+        <main class="p-4">
+            <!-- Tarjetas KPI -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card-surface kpi-card p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold">En Proceso</span>
+                            <h3 class="fw-bold mb-0 mt-1" th:text="${reparacionesEnProceso}">0</h3>
+                        </div>
+                        <div class="kpi-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-gear-wide-connected"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card-surface kpi-card p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold">Vehículos Registrados</span>
+                            <h3 class="fw-bold mb-0 mt-1" th:text="${totalVehiculos}">0</h3>
+                        </div>
+                        <div class="kpi-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-car-front-fill"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card-surface kpi-card p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold">Catálogo Repuestos</span>
+                            <h3 class="fw-bold mb-0 mt-1" th:text="${totalRepuestos}">0</h3>
+                        </div>
+                        <div class="kpi-icon bg-success-subtle text-success">
+                            <i class="bi bi-box-seam-fill"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card-surface kpi-card p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <span class="text-muted small fw-semibold">Modelos Activos</span>
+                            <h3 class="fw-bold mb-0 mt-1" th:text="${totalModelos}">0</h3>
+                        </div>
+                        <div class="kpi-icon bg-info-subtle text-info">
+                            <i class="bi bi-tags-fill"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Accesos Rápidos -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="card-surface p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="fw-bold"><i class="bi bi-search text-primary me-2"></i>Consultas Rápidas (B1 y B2)</h5>
+                            <p class="text-muted small">Verifique al instante qué repuestos son compatibles con un modelo o consulte el modelo y dueño de un vehículo a partir de su placa.</p>
+                        </div>
+                        <div>
+                            <a th:href="@{/busquedas}" class="btn btn-primary btn-sm">Ir a Consultas</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-surface p-4 h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <h5 class="fw-bold"><i class="bi bi-tools text-success me-2"></i>Gestión de Órdenes</h5>
+                            <p class="text-muted small">Inicie nuevas órdenes de reparación, actualice avances técnicos y notifique automáticamente por correo al cliente al finalizar.</p>
+                        </div>
+                        <div>
+                            <a th:href="@{/reparaciones/crear}" class="btn btn-success btn-sm">Nueva Reparación</a>
+                            <a th:href="@{/reparaciones/listar}" class="btn btn-outline-secondary btn-sm ms-1">Ver Historial</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas Reparaciones -->
+            <div class="card-surface p-4">
+                <h6 class="fw-bold mb-3">Actividad Reciente de Reparaciones</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead>
+                        <tr>
+                            <th>Placa</th>
+                            <th>Tipo de Servicio</th>
+                            <th>Mecánico</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="rep : ${ultimasReparaciones}">
+                            <td class="fw-bold" th:text="${rep.idVehiculo.placaVehiculo}"></td>
+                            <td th:text="${#strings.replace(rep.tipoReparacion.name(), '_', ' ')}"></td>
+                            <td th:text="${rep.idUsuario.nombreUsuario}"></td>
+                            <td>
+                                <span th:if="${rep.estadoReparacion.name() == 'EN_PROCESO'}" class="badge bg-warning text-dark">En Proceso</span>
+                                <span th:if="${rep.estadoReparacion.name() == 'TERMINADO'}" class="badge bg-success">Terminado</span>
+                                <span th:if="${rep.estadoReparacion.name() == 'CANCELADO'}" class="badge bg-danger">Cancelado</span>
+                            </td>
+                            <td class="text-end">
+                                <a th:href="@{/reparaciones/detalle/{id}(id=${rep.idReparacion})}" class="btn btn-sm btn-outline-primary">Ver</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(ultimasReparaciones)}">
+                            <td colspan="5" class="text-center text-muted py-3">Aún no hay reparaciones registradas.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

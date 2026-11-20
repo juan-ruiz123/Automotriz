@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Consultas Rápidas')}"></head>
+<body>
+<div class="app-wrapper">
+    <aside th:replace="~{fragments/layout :: sidebar('busquedas')}"></aside>
+
+    <div class="main-content">
+        <header th:replace="~{fragments/layout :: topbar('Consultas Rápidas del Taller')}"></header>
+
+        <main class="p-4">
+            <div class="row g-4">
+                <!-- B1: Repuestos compatibles con un modelo -->
+                <div class="col-lg-6">
+                    <div class="card-surface p-4 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-primary">B1</span>
+                            <h5 class="fw-bold mb-0">Repuestos Compatibles por Modelo</h5>
+                        </div>
+                        <p class="text-muted small">Seleccione un modelo para listar todos los repuestos activos compatibles disponibles en inventario.</p>
+
+                        <form th:action="@{/busquedas/repuestos-por-modelo}" method="get" class="row g-2 mb-4">
+                            <div class="col-sm-8">
+                                <select name="idModelo" class="form-select" required>
+                                    <option value="">Seleccione un modelo...</option>
+                                    <option th:each="m : ${modelos}"
+                                            th:value="${m.idModelo}"
+                                            th:selected="${modeloSeleccionadoId != null and modeloSeleccionadoId == m.idModelo}"
+                                            th:text="${m.marcaModelo + ' - ' + m.nombreModelo}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-sm-4 d-grid">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-search me-1"></i>Buscar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Mensaje sin resultados -->
+                        <div th:if="${mensajeB1}" class="alert alert-warning d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span th:text="${mensajeB1}"></span>
+                        </div>
+
+                        <!-- Tabla de resultados B1 -->
+                        <div th:if="${repuestosCompatibles != null and !#lists.isEmpty(repuestosCompatibles)}" class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>EAN</th>
+                                    <th>Precio</th>
+                                    <th>Stock</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="r : ${repuestosCompatibles}">
+                                    <td class="fw-semibold" th:text="${r.nombreRepuesto}"></td>
+                                    <td><code th:text="${r.eanRepuesto}"></code></td>
+                                    <td th:text="${'$ ' + #numbers.formatDecimal(r.precioRepuesto, 1, 'POINT', 0, 'COMMA')}"></td>
+                                    <td>
+                                        <span class="badge" th:classappend="${r.stockRepuesto > 5 ? 'bg-success' : 'bg-danger'}" th:text="${r.stockRepuesto + ' und'}"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- B2: Modelo por placa -->
+                <div class="col-lg-6">
+                    <div class="card-surface p-4 h-100">
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-info text-dark">B2</span>
+                            <h5 class="fw-bold mb-0">Consultar Modelo por Placa</h5>
+                        </div>
+                        <p class="text-muted small">Ingrese la placa en formato <strong>ABC-123</strong> para consultar el modelo, marca y tipo de placa del vehículo.</p>
+
+                        <form th:action="@{/busquedas/modelo-por-placa}" method="get" class="row g-2 mb-4">
+                            <div class="col-sm-8">
+                                <input type="text" name="placa" class="form-control text-uppercase"
+                                       th:value="${placaBuscada}"
+                                       placeholder="Ej: ABC-123" maxlength="7" required>
+                            </div>
+                            <div class="col-sm-4 d-grid">
+                                <button type="submit" class="btn btn-info text-dark fw-semibold">
+                                    <i class="bi bi-car-front me-1"></i>Consultar
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Error de formato -->
+                        <div th:if="${errorB2}" class="alert alert-danger d-flex align-items-center">
+                            <i class="bi bi-x-circle-fill me-2"></i>
+                            <span th:text="${errorB2}"></span>
+                        </div>
+
+                        <!-- Placa no registrada -->
+                        <div th:if="${mensajeB2}" class="alert alert-warning d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <span th:text="${mensajeB2}"></span>
+                        </div>
+
+                        <!-- Tarjeta de Resultado B2 -->
+                        <div th:if="${vehiculoEncontrado != null}" class="p-3 rounded border border-primary-subtle bg-primary-subtle bg-opacity-10">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="badge bg-dark fs-6" th:text="${vehiculoEncontrado.placaVehiculo}"></span>
+                                <span class="badge"
+                                      th:classappend="${vehiculoEncontrado.tipoPlaca.name() == 'AMARILLA' ? 'bg-warning text-dark' : 'bg-light text-dark border'}"
+                                      th:text="${'Placa ' + vehiculoEncontrado.tipoPlaca.name()}"></span>
+                            </div>
+                            <hr class="my-2">
+                            <div class="row g-2 small">
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Marca:</span>
+                                    <strong class="fs-6" th:text="${vehiculoEncontrado.idModelo.marcaModelo}"></strong>
+                                </div>
+                                <div class="col-6">
+                                    <span class="text-muted d-block">Modelo:</span>
+                                    <strong class="fs-6" th:text="${vehiculoEncontrado.idModelo.nombreModelo}"></strong>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <span class="text-muted d-block">Propietario:</span>
+                                    <span th:text="${vehiculoEncontrado.nombreDuenoVehi}"></span>
+                                </div>
+                                <div class="col-6 mt-2">
+                                    <span class="text-muted d-block">Estado Vehículo:</span>
+                                    <span th:text="${vehiculoEncontrado.activoVehiculo ? 'Activo' : 'Dado de baja'}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:replace="~{fragments/layout :: feedback}"></div>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

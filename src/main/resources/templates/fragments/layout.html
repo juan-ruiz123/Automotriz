@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo + ' | Taller Automotriz'}">Taller Automotriz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- Barra Lateral Plegable -->
+<aside id="sidebar" class="sidebar" th:fragment="sidebar(activePage)">
+    <a th:href="@{/}" class="brand">
+        <i class="bi bi-wrench-adjustable-circle-fill text-primary fs-3"></i>
+        <span class="brand-text">AutoTaller Pro</span>
+    </a>
+
+    <div class="sidebar-section-title">Principal</div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'inicio' ? 'active' : ''}" th:href="@{/}">
+                <i class="bi bi-speedometer2"></i>
+                <span class="nav-text">Panel General</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'busquedas' ? 'active' : ''}" th:href="@{/busquedas}">
+                <i class="bi bi-search"></i>
+                <span class="nav-text">Consultas Rápidas</span>
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-section-title">Operación</div>
+    <ul class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'reparaciones' ? 'active' : ''}" th:href="@{/reparaciones/listar}">
+                <i class="bi bi-tools"></i>
+                <span class="nav-text">Reparaciones</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'vehiculos' ? 'active' : ''}" th:href="@{/vehiculos/listar}">
+                <i class="bi bi-car-front-fill"></i>
+                <span class="nav-text">Vehículos</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'modelos' ? 'active' : ''}" th:href="@{/modelos/listar}">
+                <i class="bi bi-tags-fill"></i>
+                <span class="nav-text">Modelos</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'repuestos' ? 'active' : ''}" th:href="@{/repuestos/listar}">
+                <i class="bi bi-box-seam-fill"></i>
+                <span class="nav-text">Repuestos</span>
+            </a>
+        </li>
+    </ul>
+
+    <div th:if="${esAdmin}" class="sidebar-section-title">Administración</div>
+    <ul th:if="${esAdmin}" class="nav flex-column">
+        <li class="nav-item">
+            <a class="nav-link" th:classappend="${activePage == 'usuarios' ? 'active' : ''}" th:href="@{/usuarios/listar}">
+                <i class="bi bi-people-fill"></i>
+                <span class="nav-text">Usuarios y Roles</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+<!-- Barra Superior -->
+<header class="topbar" th:fragment="topbar(tituloPagina)">
+    <div class="d-flex align-items-center gap-3">
+        <button id="btnToggleSidebar" type="button" class="btn btn-outline-secondary btn-sm" title="Contraer/Expandir menú">
+            <i class="bi bi-list fs-5"></i>
+        </button>
+        <h5 class="mb-0 fw-bold" th:text="${tituloPagina}">Título</h5>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+        <button id="btnToggleTheme" type="button" class="btn btn-outline-secondary btn-sm rounded-circle" style="width: 36px; height: 36px;" title="Cambiar tema">
+            <i id="themeIcon" class="bi bi-moon-stars-fill"></i>
+        </button>
+
+        <div class="d-none d-md-flex flex-column text-end">
+            <span class="fw-semibold small" th:text="${nombreUsuarioActual != null ? nombreUsuarioActual : usernameActual}">Usuario</span>
+            <span class="badge bg-primary-subtle text-primary border border-primary-subtle" style="font-size: 0.68rem;" th:text="${rolUsuarioActual}">ROL</span>
+        </div>
+
+        <form th:action="@{/logout}" method="post" class="m-0">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-box-arrow-right me-1"></i> Salir
+            </button>
+        </form>
+    </div>
+</header>
+
+<!-- Notificaciones Toast + Modal de Confirmación Propio -->
+<div th:fragment="feedback">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+        <div th:if="${exito}" class="toast align-items-center text-bg-success border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-check-circle-fill me-2"></i><span th:text="${exito}"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+        <div th:if="${error}" class="toast align-items-center text-bg-danger border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}"></span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación -->
+    <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold text-danger">
+                        <i class="bi bi-exclamation-octagon-fill me-2"></i>Confirmar Acción
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p id="confirmModalMessage" class="mb-0">¿Está seguro de continuar?</p>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a id="confirmModalBtn" href="#" class="btn btn-danger">Confirmar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block th:fragment="scripts">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+</th:block>
+
+</body>
+</html>
